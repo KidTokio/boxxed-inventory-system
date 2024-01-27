@@ -139,7 +139,7 @@ def verInventario():
                     timer()
                     navegador()
                     
-                    if not inventarioEncontrado:
+                if not inventarioEncontrado:
                         limpiar()
                         titulo()
                         console.print(f"[red]No se encontro ningun inventario con el nombre '{nombreInventario}'[/red]")
@@ -182,14 +182,14 @@ def modificarInventario():
                         
                     console.print(f"\n[yellow][A][/yellow][white] añadir o modificar un item[/white]    [yellow][E][/yellow][white] eliminar un item[/white]    [yellow][ESC][/yellow][white] regresar al menu[/white]")
 
-                    if not inventarioEncontrado:
-                        limpiar()
-                        titulo()
-                        console.print(f"[red]No se encontro ningun inventario con el nombre '{nombreInventario}'[/red]")
-                        time.sleep(2)
-                        navegador()
+                if not inventarioEncontrado:
+                    limpiar()
+                    titulo()
+                    console.print(f"[red]No se encontro ningun inventario con el nombre '{nombreInventario}'[/red]")
+                    time.sleep(2)
+                    navegador()
 
-                    while True:
+                while True:
                         tecla = keyboard.read_key(suppress=True)
 
                         if tecla == "a":

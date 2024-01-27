@@ -65,7 +65,6 @@ def menu(opciones, seleccion):
 
 def navegador():
     global seleccion
-    seleccion = 0
     
     limpiar()
     menu(menu_principal, seleccion)

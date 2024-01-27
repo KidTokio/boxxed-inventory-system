@@ -23,19 +23,4 @@ External Libraries: keyboard, time, rich
 4. Simplify the management of your inventories with Boxxed!
 
 #### This project is open-source, and contributions and suggestions are welcomed.
-
-# 📦 Boxxed.exe installation
-
-## 🛠️ Quick start
-
-1. Download the compressed file Boxxed_app.zip from this repository.
-2. Unzip the file to the location of your choice.
-3. Open the resulting folder and run Boxxed.exe.
-4. Explore, modify, and manage your inventories effortlessly!
-
-## 📑 Requirements
-
-1. This executable is designed for Windows systems.
-2. No additional installation is required.
-
 #### Thank your for use/test Boxxed!

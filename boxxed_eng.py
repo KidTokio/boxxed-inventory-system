@@ -138,7 +138,7 @@ def view_inventory():
                     timer()
                     navigator()
                     
-                if not inventory_found:
+            if not inventory_found:
                         clear()
                         title()
                         console.print(f"[red]No inventory found with the name '{inventory_name}'[/red]")
@@ -181,14 +181,14 @@ def modify_inventory():
                         
                     console.print(f"\n[yellow][A][/yellow][white] add or modify an item[/white]    [yellow][E][/yellow][white] delete an item[/white]    [yellow][ESC][/yellow][white] return to menu[/white]")
 
-                if not inventory_found:
+            if not inventory_found:
                     clear()
                     title()
                     console.print(f"[red]No inventory found with the name '{inventory_name}'[/red]")
                     time.sleep(2)
                     navigator()
 
-                while True:
+            while True:
                         key = keyboard.read_key(suppress=True)
 
                         if key == "a":

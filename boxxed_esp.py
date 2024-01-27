@@ -1,8 +1,15 @@
 import keyboard
 import time
-from rich.console import Console
 import pickle
 import os
+import sys
+import pygetwindow as gw
+from rich.console import Console
+
+try:
+    import ctypes
+except ImportError:
+    ctypes = None
 
 console = Console()
 seleccion = 0
@@ -13,6 +20,16 @@ def guardarInventarios():
     with open('inventarios.pkl', 'wb') as file:
         pickle.dump(listaInventarios, file)
 
+def set_terminal_title(title):
+    if sys.platform.startswith('win'):
+        ctypes.windll.kernel32.SetConsoleTitleW(title)
+    elif sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
+        sys.stdout.write(f"\x1b]2;{title}\x07")
+    else:
+        print("No se pudo determinar el sistema operativo para cambiar el título de la terminal.")
+
+set_terminal_title("Boxxed")
+
 def cargarInventarios():
     try:
         with open('inventarios.pkl', 'rb') as file:
@@ -22,12 +39,16 @@ def cargarInventarios():
     
 listaInventarios = cargarInventarios()
 
+def boxxedActivo():
+    active_window = gw.getActiveWindow()
+    return active_window and "Boxxed" in active_window.title
+
 def limpiar():
     sistema_operativo = os.name
 
     if sistema_operativo == 'posix':
         os.system('clear')
-    elif sistema_operativo == 'nt':  # Windows
+    elif sistema_operativo == 'nt':
         os.system('cls')
     else:
         os.system('clear')
@@ -70,33 +91,36 @@ def navegador():
     menu(menu_principal, seleccion)
     
     while True:
-        tecla = keyboard.read_key(suppress=True)
 
-        if tecla == "flecha arriba":
-            seleccion = (seleccion - 1) % len(menu_principal)
-        elif tecla == "flecha abajo":
-            seleccion = (seleccion + 1) % len(menu_principal)
+        if boxxedActivo():
 
-        elif tecla == "enter":
-            if seleccion == 0:
-                limpiar()
-                verInventario()
-                break
-            elif seleccion == 1:
-                limpiar()
-                modificarInventario()
-                break
-            elif seleccion == 2:
-                limpiar()
-                crearInventario()
-                break
-            elif seleccion == 3:
-                limpiar()
-                eliminarInventario()
-                break
-            elif seleccion == 4:
-                limpiar()
-                salir()
+            tecla = keyboard.read_key(suppress=True)
+
+            if tecla == "flecha arriba":
+                seleccion = (seleccion - 1) % len(menu_principal)
+            elif tecla == "flecha abajo":
+                seleccion = (seleccion + 1) % len(menu_principal)
+
+            elif tecla == "enter":
+                if seleccion == 0:
+                    limpiar()
+                    verInventario()
+                    break
+                elif seleccion == 1:
+                    limpiar()
+                    modificarInventario()
+                    break
+                elif seleccion == 2:
+                    limpiar()
+                    crearInventario()
+                    break
+                elif seleccion == 3:
+                    limpiar()
+                    eliminarInventario()
+                    break
+                elif seleccion == 4:
+                    limpiar()
+                    salir()
 
         timer()
         limpiar()
@@ -118,8 +142,15 @@ def verInventario():
 
         if nombreInventario == "cancelar":
             timer()
-            limpiar()
             navegador()
+        elif nombreInventario == "":
+            timer()
+            limpiar()
+            titulo()
+            console.print(f"[red]Ingrese un nombre valido[/red]")
+            time.sleep(2)
+            limpiar()
+            verInventario()
         else:
             inventarioEncontrado = False
 
@@ -136,16 +167,17 @@ def verInventario():
 
                     keyboard.wait("esc")
                     timer()
-                    navegador()
+                    limpiar()
+                    verInventario()
                     
             if not inventarioEncontrado:
-                        limpiar()
-                        titulo()
-                        console.print(f"[red]No se encontro ningun inventario con el nombre '{nombreInventario}'[/red]")
-                        time.sleep(2)
-                        guardarInventarios()
-                        limpiar()
-                        verInventario()
+                    limpiar()
+                    titulo()
+                    console.print(f"[red]No se encontro ningun inventario con el nombre '{nombreInventario}'[/red]")
+                    time.sleep(2)
+                    guardarInventarios()
+                    limpiar()
+                    verInventario()
 
 def modificarInventario():
     titulo()
@@ -300,15 +332,23 @@ def crearInventario():
         timer()
         limpiar()
         navegador()
+    elif nombreInventario == "":
+        timer()
+        limpiar()
+        titulo()
+        console.print(f"[red]Ingrese un nombre valido[/red]")
+        time.sleep(2)
+        limpiar()
+        crearInventario()
     else:
         inventario_existente = any(nombre == nombreInventario for nombre, _ in listaInventarios)
 
         if inventario_existente:
             limpiar()
             titulo()
-            console.print(f"[red]El inventario '{nombreInventario}' ya existe.[/red]")
+            console.print(f"[red]El inventario '{nombreInventario}' ya existe[/red]")
             time.sleep(2)
-            navegador()
+            crearInventario()
         else:
             nuevoInventario = dict()
             listaInventarios.append((nombreInventario, nuevoInventario))
@@ -340,22 +380,39 @@ def eliminarInventario():
             timer()
             limpiar()
             navegador()
+        elif nombreInventario == "":
+            timer()
+            limpiar()
+            titulo()
+            console.print(f"[red]Ingrese un nombre valido[/red]")
+            time.sleep(2)
+            limpiar()
+            eliminarInventario()
         else:
 
             inventarioEncontrado = False
 
             for i, (inv, cont) in enumerate(listaInventarios):
                 if inv == nombreInventario:
-                    inventarioEncontrado = True
-                    del listaInventarios[i]
+                    timer()
                     limpiar()
                     titulo()
-                    console.print(f"[yellow]¡Inventario '{nombreInventario}' eliminado con exito![/yellow]")
-                    time.sleep(2)
-                    guardarInventarios()
-                    limpiar()
-                    navegador()
-                    break
+                    console.print(f"[yellow]Escriba [red]'{nombreInventario}'[/red] para confirmar la eliminacion del inventario[/yellow]\n")
+                    
+                    confirmarInventario = input("")
+
+                    if confirmarInventario == nombreInventario:
+                        inventarioEncontrado = True
+                        del listaInventarios[i]
+                        limpiar()
+                        titulo()
+                        console.print(f"[yellow]¡Inventario '{nombreInventario}' eliminado con exito![/yellow]")
+                        time.sleep(2)
+                        guardarInventarios()
+                        limpiar()
+                        navegador()
+                        break
+
             if not inventarioEncontrado:
                 limpiar()
                 titulo()

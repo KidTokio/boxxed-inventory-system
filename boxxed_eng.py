@@ -1,17 +1,34 @@
 import keyboard
 import time
-from rich.console import Console
 import pickle
 import os
+import sys
+import pygetwindow as gw
+from rich.console import Console
+
+try:
+    import ctypes
+except ImportError:
+    ctypes = None
 
 console = Console()
 selection = 0
-main_menu = ["View Inventory", "Modify Inventory", "Create Inventory", "Delete Inventory", "Exit"]
-modify_menu = ["Add or Modify an Item", "Delete an Item"]
+main_menu = ["View inventory", "Modify inventory", "Create an inventory", "Delete an inventory", "Exit"]
+modify_menu = ["Add or modify an item", "Delete an item"]
 
 def save_inventories():
     with open('inventories.pkl', 'wb') as file:
         pickle.dump(inventory_list, file)
+
+def set_terminal_title(title):
+    if sys.platform.startswith('win'):
+        ctypes.windll.kernel32.SetConsoleTitleW(title)
+    elif sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
+        sys.stdout.write(f"\x1b]2;{title}\x07")
+    else:
+        print("Unable to determine the operating system to change the terminal title.")
+
+set_terminal_title("Boxxed")
 
 def load_inventories():
     try:
@@ -21,6 +38,10 @@ def load_inventories():
         return []
 
 inventory_list = load_inventories()
+
+def boxxed_active():
+    active_window = gw.getActiveWindow()
+    return active_window and "Boxxed" in active_window.title
 
 def clear():
     operating_system = os.name
@@ -70,33 +91,36 @@ def navigator():
     menu(main_menu, selection)
     
     while True:
-        key = keyboard.read_key(suppress=True)
 
-        if key == "up":
-            selection = (selection - 1) % len(main_menu)
-        elif key == "down":
-            selection = (selection + 1) % len(main_menu)
+        if boxxed_active():
 
-        elif key == "enter":
-            if selection == 0:
-                clear()
-                view_inventory()
-                break
-            elif selection == 1:
-                clear()
-                modify_inventory()
-                break
-            elif selection == 2:
-                clear()
-                create_inventory()
-                break
-            elif selection == 3:
-                clear()
-                delete_inventory()
-                break
-            elif selection == 4:
-                clear()
-                quit_program()
+            key = keyboard.read_key(suppress=True)
+
+            if key == "up":
+                selection = (selection - 1) % len(main_menu)
+            elif key == "down":
+                selection = (selection + 1) % len(main_menu)
+
+            elif key == "enter":
+                if selection == 0:
+                    clear()
+                    view_inventory()
+                    break
+                elif selection == 1:
+                    clear()
+                    modify_inventory()
+                    break
+                elif selection == 2:
+                    clear()
+                    create_inventory()
+                    break
+                elif selection == 3:
+                    clear()
+                    delete_inventory()
+                    break
+                elif selection == 4:
+                    clear()
+                    quit_program()
 
         timer()
         clear()
@@ -113,13 +137,20 @@ def view_inventory():
     else:
         for inv, _ in inventory_list:
             console.print(f"[white]{inv}[/white]", style="bold")
-        console.print(f"\n[yellow]Enter the name of the inventory you want to review or type[/yellow] [red]'cancel'[/red] [yellow]to return to the menu.[/yellow]\n")
+        console.print(f"\n[yellow]Enter the name of the inventory you want to review or enter[/yellow] [red]'cancel'[/red] [yellow]to return to the menu.[/yellow]\n")
         inventory_name = input("")
 
         if inventory_name == "cancel":
             timer()
-            clear()
             navigator()
+        elif inventory_name == "":
+            timer()
+            clear()
+            title()
+            console.print(f"[red]Enter a valid name[/red]")
+            time.sleep(2)
+            clear()
+            view_inventory()
         else:
             inventory_found = False
 
@@ -136,16 +167,17 @@ def view_inventory():
 
                     keyboard.wait("esc")
                     timer()
-                    navigator()
+                    clear()
+                    view_inventory()
                     
             if not inventory_found:
-                        clear()
-                        title()
-                        console.print(f"[red]No inventory found with the name '{inventory_name}'[/red]")
-                        time.sleep(2)
-                        save_inventories()
-                        clear()
-                        view_inventory()
+                    clear()
+                    title()
+                    console.print(f"[red]No inventory found with the name '{inventory_name}'[/red]")
+                    time.sleep(2)
+                    save_inventories()
+                    clear()
+                    view_inventory()
 
 def modify_inventory():
     title()
@@ -159,7 +191,7 @@ def modify_inventory():
         for inv, _ in inventory_list:
             console.print(f"[white]{inv}[/white]", style="bold")
 
-        console.print(f"\n[yellow]Enter the name of the inventory you want to modify or type[/yellow] [red]'cancel'[/red] [yellow]to return to the menu.[/yellow]\n")
+        console.print(f"\n[yellow]Enter the name of the inventory you want to modify or enter[/yellow] [red]'cancel'[/red] [yellow]to return to the menu.[/yellow]\n")
         inventory_name = input("")
 
         if inventory_name == "cancel":
@@ -195,7 +227,7 @@ def modify_inventory():
                             clear()
                             title()
                             console.print(f"[yellow]Adding/modifying an item in the inventory '{inventory_name}'[/yellow]\n", style="bold")
-                            console.print(f"[yellow]Enter the name of the item you want to add/modify or type[/yellow][red] 'cancel'[/red][yellow] to return to the menu[/yellow]\n")
+                            console.print(f"[yellow]Enter the name of the item you want to add/modify or enter[/yellow][red] 'cancel'[/red][yellow] to go back to the menu[/yellow]\n")
                             item_name = input("")
 
                             if item_name == "cancel":
@@ -215,8 +247,8 @@ def modify_inventory():
                             else:
                                 clear()
                                 title()
-                                console.print(f"[yellow]Adding a new item to the inventory '{inventory_name}'[/yellow]\n", style="bold")
-                                console.print(f"[yellow]Enter the quantity of the item you want to add/modify or type[/yellow][red] 'cancel'[/red][yellow] to return to the menu[/yellow]\n")
+                                console.print(f"[yellow]Adding a new item in the inventory '{inventory_name}'[/yellow]\n", style="bold")
+                                console.print(f"[yellow]Enter the quantity of the item you want to add/modify or enter[/yellow][red] 'cancel'[/red][yellow] to go back to the menu[/yellow]\n")
                                 item_quantity = input("")
 
                                 if item_quantity == "cancel":
@@ -247,7 +279,7 @@ def modify_inventory():
                             clear()
                             title()
                             console.print(f"[yellow]Deleting an item in the inventory '{inventory_name}'[/yellow]\n", style="bold")
-                            console.print(f"[yellow]Enter the name of the item you want to delete or type[/yellow][red] 'cancel'[/red][yellow] to return to the menu[/yellow]\n")
+                            console.print(f"[yellow]Enter the name of the item you want to delete or enter[/yellow][red] 'cancel'[/red][yellow] to go back to the menu[/yellow]\n")
                             item_name = input("")
 
                             if item_name == "cancel":
@@ -288,7 +320,6 @@ def modify_inventory():
                         if key == "esc":
                             modify_inventory()
 
-
 def create_inventory():
     title()
     console.print(f"[yellow]Creating an inventory[/yellow]", style="bold")
@@ -300,15 +331,23 @@ def create_inventory():
         timer()
         clear()
         navigator()
+    elif inventory_name == "":
+        timer()
+        clear()
+        title()
+        console.print(f"[red]Enter a valid name[/red]")
+        time.sleep(2)
+        clear()
+        create_inventory()
     else:
-        inventory_exists = any(name == inventory_name for name, _ in inventory_list)
+        existing_inventory = any(name == inventory_name for name, _ in inventory_list)
 
-        if inventory_exists:
+        if existing_inventory:
             clear()
             title()
-            console.print(f"[red]The inventory '{inventory_name}' already exists.[/red]")
+            console.print(f"[red]The inventory '{inventory_name}' already exists[/red]")
             time.sleep(2)
-            navigator()
+            create_inventory()
         else:
             new_inventory = dict()
             inventory_list.append((inventory_name, new_inventory))
@@ -339,22 +378,38 @@ def delete_inventory():
             timer()
             clear()
             navigator()
+        elif inventory_name == "":
+            timer()
+            clear()
+            title()
+            console.print(f"[red]Enter a valid name[/red]")
+            time.sleep(2)
+            clear()
+            delete_inventory()
         else:
-
             inventory_found = False
 
-            for i, (name, content) in enumerate(inventory_list):
-                if name == inventory_name:
-                    inventory_found = True
-                    del inventory_list[i]
+            for i, (inv, cont) in enumerate(inventory_list):
+                if inv == inventory_name:
+                    timer()
                     clear()
                     title()
-                    console.print(f"[yellow]Inventory '{inventory_name}' deleted successfully![/yellow]")
-                    time.sleep(2)
-                    save_inventories()
-                    clear()
-                    navigator()
-                    break
+                    console.print(f"[yellow]Type [red]'{inventory_name}'[/red] to confirm the deletion of the inventory[/yellow]\n")
+                    
+                    confirm_inventory = input("")
+
+                    if confirm_inventory == inventory_name:
+                        inventory_found = True
+                        del inventory_list[i]
+                        clear()
+                        title()
+                        console.print(f"[yellow]Inventory '{inventory_name}' deleted successfully![/yellow]")
+                        time.sleep(2)
+                        save_inventories()
+                        clear()
+                        navigator()
+                        break
+
             if not inventory_found:
                 clear()
                 title()

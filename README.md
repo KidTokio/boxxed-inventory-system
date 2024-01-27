@@ -22,5 +22,7 @@ External Libraries: keyboard, time, rich
 3. Run the program: python main.py
 4. Simplify the management of your inventories with Boxxed!
 
+For it to work correctly, you must have the language of your operating system set to English or Spanish and use the specified code for each of the languages.
+
 #### This project is open-source, and contributions and suggestions are welcomed.
 #### Thank your for use/test Boxxed!

@@ -218,7 +218,8 @@ def modify_inventory():
                     title()
                     console.print(f"[red]No inventory found with the name '{inventory_name}'[/red]")
                     time.sleep(2)
-                    navigator()
+                    clear()
+                    modify_inventory()
 
             while True:
                         key = keyboard.read_key(suppress=True)
@@ -416,6 +417,6 @@ def delete_inventory():
                 console.print(f"[red]No inventory found with the name '{inventory_name}'[/red]")
                 time.sleep(2)
                 clear()
-                navigator()
+                delete_inventory()
 
 navigator()

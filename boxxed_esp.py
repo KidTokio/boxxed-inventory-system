@@ -218,7 +218,8 @@ def modificarInventario():
                     titulo()
                     console.print(f"[red]No se encontro ningun inventario con el nombre '{nombreInventario}'[/red]")
                     time.sleep(2)
-                    navegador()
+                    limpiar()
+                    modificarInventario()
 
             while True:
                         tecla = keyboard.read_key(suppress=True)
@@ -418,6 +419,6 @@ def eliminarInventario():
                 console.print(f"[red]No se encontro un inventario con el nombre '{nombreInventario}'[/red]")
                 time.sleep(2)
                 limpiar()
-                navegador()
+                eliminarInventario()
 
 navegador()

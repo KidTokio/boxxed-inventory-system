@@ -25,12 +25,11 @@ listaInventarios = cargarInventarios()
 def limpiar():
     sistema_operativo = os.name
 
-    if sistema_operativo == 'posix':  # UNIX (Linux y macOS)
+    if sistema_operativo == 'posix':
         os.system('clear')
     elif sistema_operativo == 'nt':  # Windows
         os.system('cls')
     else:
-        # Otros sistemas operativos (puede que no funcione en todos)
         os.system('clear')
 
 def timer():
@@ -74,14 +73,10 @@ def navegador():
     while True:
         tecla = keyboard.read_key(suppress=True)
 
-        #Navegador
-
         if tecla == "flecha arriba":
             seleccion = (seleccion - 1) % len(menu_principal)
         elif tecla == "flecha abajo":
             seleccion = (seleccion + 1) % len(menu_principal)
-
-        #Selector
 
         elif tecla == "enter":
             if seleccion == 0:

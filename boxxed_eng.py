@@ -65,7 +65,6 @@ def menu(options, selection):
 
 def navigator():
     global selection
-    selection = 0
     
     clear()
     menu(main_menu, selection)

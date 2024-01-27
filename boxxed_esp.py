@@ -320,7 +320,6 @@ def modificarInventario():
                         if tecla == "esc":
                             modificarInventario()
 
-
 def crearInventario():
     titulo()
     console.print(f"[yellow]Creando un inventario[/yellow]", style="bold")

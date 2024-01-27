@@ -25,12 +25,11 @@ inventory_list = load_inventories()
 def clear():
     operating_system = os.name
 
-    if operating_system == 'posix':  # UNIX (Linux and macOS)
+    if operating_system == 'posix':
         os.system('clear')
-    elif operating_system == 'nt':  # Windows
+    elif operating_system == 'nt':
         os.system('cls')
     else:
-        # Other operating systems (may not work on all)
         os.system('clear')
 
 def timer():
@@ -74,14 +73,10 @@ def navigator():
     while True:
         key = keyboard.read_key(suppress=True)
 
-        # Navigator
-
         if key == "up":
             selection = (selection - 1) % len(main_menu)
         elif key == "down":
             selection = (selection + 1) % len(main_menu)
-
-        # Selector
 
         elif key == "enter":
             if selection == 0:

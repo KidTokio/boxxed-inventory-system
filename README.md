@@ -14,7 +14,7 @@ Delete Inventory: Remove entire inventories when they are no longer needed.
 
 ## 📑 Requirements:
 Python 3.x
-External Libraries: keyboard, time, rich
+External Libraries: keyboard, time, rich, pygetwindow
 
 ## 🛠️ Installation Instructions:
 1. Clone this repository: git clone https://github.com/KidTokio/boxxed-inventory-system.git
